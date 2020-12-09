@@ -4,14 +4,12 @@
   "description": "TodoMVC implemented in Svelte",
   "scripts": {
     "postinstall": "dotnet tool restore",
-    "copyfiles": "mkdir -p dist && cp node_modules/todomvc-app-css/index.css public/todomvc-app-css.css && cp node_modules/todomvc-common/base.css public/todomvc-common.css && cp node_modules/todomvc-common/base.js public/todomvc-common.js",
-    "build": "npm run copyfiles && dotnet fable src --run webpack --mode production",
-    "start": "npm run copyfiles && dotnet fable watch src --run webpack serve --content-base public"
+    "build": "dotnet fable src --run webpack --mode production",
+    "start": "dotnet fable watch src --run webpack serve --content-base public"
   },
   "files": [
     "index.html",
-    "public",
-    "node_modules/todomvc-app-css/index.css"
+    "public"
   ],
   "repository": {
     "type": "git",
@@ -27,10 +25,6 @@
     "url": "https://github.com/sveltejs/svelte-todomvc/issues"
   },
   "homepage": "https://github.com/sveltejs/svelte-todomvc",
-  "dependencies": {
-    "todomvc-app-css": "2.2.0",
-    "todomvc-common": "^1.0.5"
-  },
   "devDependencies": {
     "svelte": "^3.31.0",
     "svelte-loader": "^2.13.6",
