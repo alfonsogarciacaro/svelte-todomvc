@@ -1,121 +1,72 @@
 <script>
-	const ENTER_KEY = 13;
-	const ESCAPE_KEY = 27;
-
-	let currentFilter = 'all';
-	let items = [];
-	let editing = null;
-
-	try {
-		items = JSON.parse(localStorage.getItem('todos-svelte')) || [];
-	} catch (err) {
-		items = [];
-	}
+	import { store } from "./TodoMVC.fs.js"
 
 	const updateView = () => {
-		currentFilter = 'all';
+		let visibility = 'all';
 		if (window.location.hash === '#/active') {
-			currentFilter = 'active';
+			visibility = 'active';
 		} else if (window.location.hash === '#/completed') {
-			currentFilter = 'completed';
+			visibility = 'completed';
 		}
+		store.on("ChangeVisibility", visibility);
 	};
 
 	window.addEventListener('hashchange', updateView);
 	updateView();
 
-	function clearCompleted() {
-		items = items.filter(item => !item.completed);
-	}
+	$: filtered = $store.visibility === 'all'
+		? $store.entries
+		: $store.visibility === 'completed'
+			? $store.entries.filter(item => item.completed)
+			: $store.entries.filter(item => !item.completed);
 
-	function remove(index) {
-		items = items.slice(0, index).concat(items.slice(index + 1));
-	}
+	$: numActive = $store.entries.filter(item => !item.completed).length;
 
-	function toggleAll(event) {
-		items = items.map(item => ({
-			id: item.id,
-			description: item.description,
-			completed: event.target.checked
-		}));
-	}
-
-	function createNew(event) {
-		if (event.which === ENTER_KEY) {
-			items = items.concat({
-				id: uuid(),
-				description: event.target.value,
-				completed: false
-			});
-			event.target.value = '';
-		}
-	}
-
-	function handleEdit(event) {
-		if (event.which === ENTER_KEY) event.target.blur();
-		else if (event.which === ESCAPE_KEY) editing = null;
-	}
-
-	function submit(event) {
-		items[editing].description = event.target.value;
-		editing = null;
-	}
-
-	function uuid() {
-		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-			var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-			return v.toString(16);
-		});
-	}
-
-	$: filtered = currentFilter === 'all'
-		? items
-		: currentFilter === 'completed'
-			? items.filter(item => item.completed)
-			: items.filter(item => !item.completed);
-
-	$: numActive = items.filter(item => !item.completed).length;
-
-	$: numCompleted = items.filter(item => item.completed).length;
-
-	$: try {
-		localStorage.setItem('todos-svelte', JSON.stringify(items));
-	} catch (err) {
-		// noop
-	}
+	$: numCompleted = $store.entries.filter(item => item.completed).length;
 </script>
 
 <header class="header">
 	<h1>todos</h1>
 	<input
 		class="new-todo"
-		on:keydown={createNew}
+		on:keydown={ev => {
+			if (ev.key === "Enter") {
+				store.on("Add", ev.target.value)
+				ev.target.value = '';
+			}
+		}}
 		placeholder="What needs to be done?"
 		autofocus
 	>
 </header>
 
-{#if items.length > 0}
+{#if $store.entries.length > 0}
 	<section class="main">
-		<input id="toggle-all" class="toggle-all" type="checkbox" on:change={toggleAll} checked="{numCompleted === items.length}">
+		<input id="toggle-all" class="toggle-all" type="checkbox" on:change={() => store.on("CheckAll")} checked="{numCompleted === $store.entries.length}">
 		<label for="toggle-all">Mark all as complete</label>
 
 		<ul class="todo-list">
-			{#each filtered as item, index (item.id)}
-				<li class="{item.completed ? 'completed' : ''} {editing === index ? 'editing' : ''}">
+			{#each filtered as item}
+				<li class="{item.completed ? 'completed' : ''} {item.editing ? 'editing' : ''}">
 					<div class="view">
 						<input class="toggle" type="checkbox" bind:checked={item.completed}>
-						<label on:dblclick="{() => editing = index}">{item.description}</label>
-						<button on:click="{() => remove(index)}" class="destroy"></button>
+						<label on:dblclick="{() => store.on("Edit", item.id, true)}">{item.description}</label>
+						<button on:click="{() => store.on("Delete", item.id)}" class="destroy"></button>
 					</div>
 
-					{#if editing === index}
+					{#if item.editing}
 						<input
 							value='{item.description}'
 							id="edit"
 							class="edit"
-							on:keydown={handleEdit}
-							on:blur={submit}
+							on:keydown={ev => {
+								if (ev.key === "Enter") {
+									ev.target.blur();
+									store.on("Update", item.id, ev.target.value)
+								} else if (ev.key === "Escape") {
+									store.on("Edit", item.id, false);
+								}
+							}}
 							autofocus
 						>
 					{/if}
@@ -129,13 +80,13 @@
 			</span>
 
 			<ul class="filters">
-				<li><a class="{currentFilter === 'all' ? 'selected' : ''}" href="#/">All</a></li>
-				<li><a class="{currentFilter === 'active' ? 'selected' : ''}" href="#/active">Active</a></li>
-				<li><a class="{currentFilter === 'completed' ? 'selected' : ''}" href="#/completed">Completed</a></li>
+				<li><a class="{$store.visibility === 'all' ? 'selected' : ''}" href="#/">All</a></li>
+				<li><a class="{$store.visibility === 'active' ? 'selected' : ''}" href="#/active">Active</a></li>
+				<li><a class="{$store.visibility === 'completed' ? 'selected' : ''}" href="#/completed">Completed</a></li>
 			</ul>
 
 			{#if numCompleted}
-				<button class="clear-completed" on:click={clearCompleted}>
+				<button class="clear-completed" on:click={() => store.on("DeleteComplete")}>
 					Clear completed
 				</button>
 			{/if}

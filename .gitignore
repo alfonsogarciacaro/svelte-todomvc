@@ -3,3 +3,7 @@ node_modules
 npm-debug.log
 dist
 public/bundle.*
+.ionide/
+bin/
+obj/
+*.fs.js
