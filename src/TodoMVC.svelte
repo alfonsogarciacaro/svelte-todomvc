@@ -61,12 +61,12 @@
 							class="edit"
 							on:keydown={ev => {
 								if (ev.key === "Enter") {
-									ev.target.blur();
 									store.on("Update", item.id, ev.target.value)
 								} else if (ev.key === "Escape") {
-									store.on("Edit", item.id, false);
+									ev.target.blur();
 								}
 							}}
+							on:blur={_ => store.on("Edit", item.id, false)}
 							autofocus
 						>
 					{/if}

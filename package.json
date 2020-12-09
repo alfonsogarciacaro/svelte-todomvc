@@ -5,11 +5,8 @@
   "scripts": {
     "postinstall": "dotnet tool restore",
     "copyfiles": "mkdir -p dist && cp node_modules/todomvc-app-css/index.css public/todomvc-app-css.css && cp node_modules/todomvc-common/base.css public/todomvc-common.css && cp node_modules/todomvc-common/base.js public/todomvc-common.js",
-    "build": "npm run copyfiles && dotnet fable src --run rollup -c",
-    "dev": "npm run copyfiles && dotnet fable watch src --run rollup -cw",
-    "deploy": "surge public svelte-todomvc.surge.sh",
-    "predeploy": "npm run build",
-    "start": "http-server public & npm run dev & open http://localhost:8080"
+    "build": "npm run copyfiles && dotnet fable src --run webpack --mode production",
+    "start": "npm run copyfiles && dotnet fable watch src --run webpack serve --content-base public"
   },
   "files": [
     "index.html",
@@ -35,11 +32,10 @@
     "todomvc-common": "^1.0.5"
   },
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^11.0.0",
-    "http-server": "^0.12.3",
-    "rollup": "^2.34.2",
-    "rollup-plugin-svelte": "^7.0.0",
-    "rollup-plugin-terser": "^7.0.2",
-    "svelte": "^3.31.0"
+    "svelte": "^3.31.0",
+    "svelte-loader": "^2.13.6",
+    "webpack": "^5.10.0",
+    "webpack-cli": "^4.2.0",
+    "webpack-dev-server": "^3.11.0"
   }
 }
