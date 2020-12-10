@@ -48,14 +48,14 @@ messages are fed into the `update` function as they occur, letting us react
 to them.
 *)
 type Msg =
-    | Edit of int*bool
-    | Update of int*string
-    | Add of string
-    | Delete of int
+    | Edit of id: int * isEditing: bool
+    | Update of id: int * text: string
+    | Add of text: string
+    | Delete of id: int
     | DeleteComplete
-    | Check of int*bool
-    | CheckAll of bool
-    | ChangeVisibility of WhatIsVisible
+    | Check of id: int * completed: bool
+    | CheckAll of completed: bool
+    | ChangeVisibility of visibility: WhatIsVisible
 
 // How we update our Model on a given Msg?
 let update (msg:Msg) (model:Model) =
@@ -98,6 +98,5 @@ let update (msg:Msg) (model:Model) =
         { model with visibility = visibility }
 
 
-let store =
-    emptyModel()
-    |> Fable.Svelte.makeStore update
+let store = emptyModel() |> Fable.Svelte.makeStore
+let dispatch = Fable.Svelte.makeDispatcher update store

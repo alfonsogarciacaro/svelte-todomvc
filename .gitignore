@@ -7,3 +7,4 @@ public/bundle.*
 bin/
 obj/
 *.fs.js
+.fake

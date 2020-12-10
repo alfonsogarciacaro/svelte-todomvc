@@ -4,8 +4,8 @@
   "description": "TodoMVC implemented in Svelte",
   "scripts": {
     "postinstall": "dotnet tool restore",
-    "build": "dotnet fable src --run webpack --mode production",
-    "start": "dotnet fable watch src --run webpack serve --content-base public"
+    "build": "dotnet fable src/TodoMVC --run webpack --mode production",
+    "start": "dotnet fable watch src/TodoMVC --exclude Fable.Svelte --run webpack serve --content-base public"
   },
   "files": [
     "index.html",

@@ -5,7 +5,7 @@ const prod = mode === 'production';
 
 module.exports = {
 	entry: {
-		bundle: ['./src/main.js']
+		bundle: ['./src/TodoMVC/main.js']
 	},
 	resolve: {
 		alias: {
@@ -21,7 +21,7 @@ module.exports = {
 	},
     // devServer: {
     //     public: '/',
-	// 	contentBase: __dirname + '/public',
+	// 	   contentBase: __dirname + '/public',
     //     port: 8080,
     //     host: '0.0.0.0',		
     //     // hot: true,

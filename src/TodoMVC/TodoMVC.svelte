@@ -1,5 +1,5 @@
 <script>
-	import { store } from "./TodoMVC.fs.js";
+	import { store, dispatch } from "./TodoMVC.fs.js";
 	import { quintOut } from "svelte/easing";
 	import { crossfade } from "svelte/transition";
 	import { flip } from "svelte/animate";
@@ -92,7 +92,7 @@
 		placeholder="What needs to be done?"
 		on:keydown={(ev) => {
 			if (ev.key === 'Enter') {
-				store.on('Add', ev.target.value);
+				dispatch.add(ev.target.value);
 				ev.target.value = '';
 			}
 		}} />
@@ -107,9 +107,9 @@
 				<input
 					type="checkbox"
 					checked={todo.completed}
-					on:change={(_) => store.on('Check', todo.id, true)} />
+					on:change={(_) => dispatch.check(todo.id, true)} />
 				{todo.description}
-				<button on:click={() => store.on('Delete', todo.id)}>x</button>
+				<button on:click={() => dispatch.delete(todo.id)}>x</button>
 			</label>
 		{/each}
 	</div>
@@ -124,9 +124,9 @@
 				<input
 					type="checkbox"
 					checked={todo.completed}
-					on:change={(_) => store.on('Check', todo.id, false)} />
+					on:change={(_) => dispatch.check(todo.id, false)} />
 				{todo.description}
-				<button on:click={() => store.on('Delete', todo.id)}>x</button>
+				<button on:click={() => dispatch.delete(todo.id)}>x</button>
 			</label>
 		{/each}
 	</div>
